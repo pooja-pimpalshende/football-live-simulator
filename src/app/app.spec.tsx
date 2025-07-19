@@ -20,8 +20,7 @@ describe('App', () => {
       </BrowserRouter>
     );
     expect(
-      getAllByText(new RegExp('Welcome football-live-simulator', 'gi')).length >
-        0
+      getAllByText(new RegExp('Football Live Simulator', 'gi')).length > 0
     ).toBeTruthy();
   });
 });
