@@ -7,12 +7,14 @@
     "start": "nx serve",
     "build": "nx build",
     "test": "nx test",
-    "e2e": "npx nx e2e e2e --ui"
+    "e2e:ui": "npx nx e2e e2e --ui",
+    "e2e:watch": "nodemon --watch apps/e2e/src --ext ts --exec \"npm run e2e:ui\""
   },
   "nx": {
     "includedScripts": []
   },
   "dependencies": {
+    "@radix-ui/react-progress": "^1.1.7",
     "@radix-ui/react-slot": "^1.2.3",
     "@reduxjs/toolkit": "^2.8.2",
     "@tailwindcss/vite": "^4.1.11",
@@ -68,6 +70,7 @@
     "eslint-plugin-react-hooks": "5.0.0",
     "jiti": "2.4.2",
     "jsdom": "~22.1.0",
+    "nodemon": "^3.1.10",
     "nx": "21.3.0",
     "postcss": "8.4.38",
     "prettier": "^2.6.2",
