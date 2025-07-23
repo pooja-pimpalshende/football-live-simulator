@@ -39,6 +39,7 @@ export default defineConfig(() => ({
   test: {
     watch: false,
     globals: true,
+    setupFiles: './vitest.setup.ts',
     environment: 'jsdom',
     include: ['{src,tests}/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}'],
     reporters: ['default'],

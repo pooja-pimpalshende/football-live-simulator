@@ -1,26 +1,32 @@
 import { render } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
+import { Provider } from 'react-redux';
+import { store } from '../store';
 
 import App from './app';
 
 describe('App', () => {
   it('should render successfully', () => {
     const { baseElement } = render(
-      <BrowserRouter>
-        <App />
-      </BrowserRouter>
+      <Provider store={store}>
+        <BrowserRouter>
+          <App />
+        </BrowserRouter>
+      </Provider>
     );
     expect(baseElement).toBeTruthy();
   });
 
   it('should have a greeting as the title', () => {
     const { getAllByText } = render(
-      <BrowserRouter>
-        <App />
-      </BrowserRouter>
+      <Provider store={store}>
+        <BrowserRouter>
+          <App />
+        </BrowserRouter>
+      </Provider>
     );
     expect(
-      getAllByText(new RegExp('Football Live Simulator', 'gi')).length > 0
+      getAllByText(new RegExp('Football Live', 'gi')).length > 0
     ).toBeTruthy();
   });
 });

@@ -52,6 +52,7 @@
     "@tanstack/react-query-devtools": "^5.83.0",
     "@tanstack/react-router-devtools": "^1.128.4",
     "@testing-library/dom": "10.4.0",
+    "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "16.1.0",
     "@types/node": "^20.19.9",
     "@types/react": "19.0.0",

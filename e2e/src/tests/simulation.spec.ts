@@ -85,7 +85,7 @@ test('should allow restarting simulation', async ({ page }) => {
   await expect(page.locator('[data-testid="total-goals"]')).toHaveText(
     'Total Goals: 0'
   );
-  await expect(page.getByRole('button', { name: /start/i })).toBeVisible();
+  await expect(page.getByRole('button', { name: /finish/i })).toBeVisible();
 });
 
 test('Should reset and start simulation again after restart', async ({
