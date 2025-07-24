@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
-interface Match {
+export interface Match {
   id: number;
   homeTeam: string;
   awayTeam: string;
