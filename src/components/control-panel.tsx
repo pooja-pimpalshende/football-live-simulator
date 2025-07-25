@@ -7,6 +7,7 @@ interface ControlPanelProps {
   elapsed: number;
   onStart: () => void;
   onRestart: () => void;
+  onFinish: () => void;
 }
 
 export const ControlPanel: React.FC<ControlPanelProps> = ({
@@ -15,6 +16,7 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
   elapsed,
   onStart,
   onRestart,
+  onFinish,
 }) => (
   <div
     className={`${'bg-white border-gray-200'} rounded-lg shadow-lg p-6 border`}
@@ -27,7 +29,7 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
           </Button>
         )}
         {started && totalGoals < 9 && (
-          <Button data-testid="finish-button" onClick={onRestart}>
+          <Button data-testid="finish-button" onClick={onFinish}>
             Finish Simulation
           </Button>
         )}

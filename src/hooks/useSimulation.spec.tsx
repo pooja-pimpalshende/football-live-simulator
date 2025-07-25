@@ -5,6 +5,7 @@ import { configureStore } from '@reduxjs/toolkit';
 import React from 'react';
 import matchReducer, { setTotalGoals } from '../store/matchSlice';
 import { useSimulation } from './useSimulation';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 vi.mock('../utils', () => ({
   clearSimInterval: (ref: any) => {
@@ -15,11 +16,47 @@ vi.mock('../utils', () => ({
   },
 }));
 
+vi.mock('./useTeamsQuery', () => ({
+  useTeamsQuery: () => ({
+    data: [
+      {
+        id: 1,
+        home: 'A',
+        away: 'B',
+        homeScore: 0,
+        awayScore: 0,
+        lastScorer: null,
+      },
+      {
+        id: 2,
+        home: 'C',
+        away: 'D',
+        homeScore: 0,
+        awayScore: 0,
+        lastScorer: null,
+      },
+      {
+        id: 3,
+        home: 'E',
+        away: 'F',
+        homeScore: 0,
+        awayScore: 0,
+        lastScorer: null,
+      },
+    ],
+    status: 'success',
+    isPending: false,
+    error: null,
+  }),
+}));
+
 function createTestStore() {
   return configureStore({
     reducer: { match: matchReducer },
   });
 }
+
+const queryClient = new QueryClient();
 
 describe('useSimulation', () => {
   beforeEach(() => {
@@ -34,8 +71,42 @@ describe('useSimulation', () => {
   it('should initialize with correct default values', () => {
     const store = createTestStore();
 
+    act(() => {
+      store.dispatch({
+        type: 'match/setMatches',
+        payload: [
+          {
+            id: 1,
+            home: 'A',
+            away: 'B',
+            homeScore: 0,
+            awayScore: 0,
+            lastScorer: null,
+          },
+          {
+            id: 2,
+            home: 'C',
+            away: 'D',
+            homeScore: 0,
+            awayScore: 0,
+            lastScorer: null,
+          },
+          {
+            id: 3,
+            home: 'E',
+            away: 'F',
+            homeScore: 0,
+            awayScore: 0,
+            lastScorer: null,
+          },
+        ],
+      });
+    });
+
     const wrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-      <Provider store={store}>{children}</Provider>
+      <QueryClientProvider client={queryClient}>
+        <Provider store={store}>{children}</Provider>
+      </QueryClientProvider>
     );
 
     const { result } = renderHook(() => useSimulation(), { wrapper });
@@ -50,7 +121,9 @@ describe('useSimulation', () => {
     const store = createTestStore();
 
     const wrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-      <Provider store={store}>{children}</Provider>
+      <QueryClientProvider client={queryClient}>
+        <Provider store={store}>{children}</Provider>
+      </QueryClientProvider>
     );
 
     const { result } = renderHook(() => useSimulation(), { wrapper });
@@ -71,8 +144,42 @@ describe('useSimulation', () => {
   it('should add a goal after 10 seconds', () => {
     const store = createTestStore();
 
+    act(() => {
+      store.dispatch({
+        type: 'match/setMatches',
+        payload: [
+          {
+            id: 1,
+            home: 'A',
+            away: 'B',
+            homeScore: 0,
+            awayScore: 0,
+            lastScorer: null,
+          },
+          {
+            id: 2,
+            home: 'C',
+            away: 'D',
+            homeScore: 0,
+            awayScore: 0,
+            lastScorer: null,
+          },
+          {
+            id: 3,
+            home: 'E',
+            away: 'F',
+            homeScore: 0,
+            awayScore: 0,
+            lastScorer: null,
+          },
+        ],
+      });
+    });
+
     const wrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-      <Provider store={store}>{children}</Provider>
+      <QueryClientProvider client={queryClient}>
+        <Provider store={store}>{children}</Provider>
+      </QueryClientProvider>
     );
 
     const { result } = renderHook(() => useSimulation(), { wrapper });
@@ -97,7 +204,9 @@ describe('useSimulation', () => {
     const store = createTestStore();
 
     const wrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-      <Provider store={store}>{children}</Provider>
+      <QueryClientProvider client={queryClient}>
+        <Provider store={store}>{children}</Provider>
+      </QueryClientProvider>
     );
 
     const { result } = renderHook(() => useSimulation(), { wrapper });
@@ -123,7 +232,9 @@ describe('useSimulation', () => {
     const store = createTestStore();
 
     const wrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-      <Provider store={store}>{children}</Provider>
+      <QueryClientProvider client={queryClient}>
+        <Provider store={store}>{children}</Provider>
+      </QueryClientProvider>
     );
 
     const { result } = renderHook(() => useSimulation(), { wrapper });
@@ -159,7 +270,9 @@ describe('useSimulation', () => {
     const store = createTestStore();
 
     const wrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-      <Provider store={store}>{children}</Provider>
+      <QueryClientProvider client={queryClient}>
+        <Provider store={store}>{children}</Provider>
+      </QueryClientProvider>
     );
 
     const { result } = renderHook(() => useSimulation(), { wrapper });
@@ -177,6 +290,28 @@ describe('useSimulation', () => {
     // Advance a bit to trigger the stopping useEffect
     act(() => {
       vi.advanceTimersByTime(1000);
+    });
+
+    expect(result.current.started).toBe(false);
+  });
+
+  it('should show only Start Simulation button after finishing', () => {
+    const store = createTestStore();
+
+    const wrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+      <QueryClientProvider client={queryClient}>
+        <Provider store={store}>{children}</Provider>
+      </QueryClientProvider>
+    );
+
+    const { result } = renderHook(() => useSimulation(), { wrapper });
+
+    act(() => {
+      result.current.startSimulation();
+    });
+
+    act(() => {
+      result.current.finishSimulation();
     });
 
     expect(result.current.started).toBe(false);

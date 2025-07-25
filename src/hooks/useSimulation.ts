@@ -9,12 +9,15 @@ import {
   setTotalGoals,
 } from '../store/matchSlice';
 import { clearSimInterval } from '../utils';
+import { useTeamsQuery } from './useTeamsQuery';
 
 export function useSimulation() {
+  const { data: teams, status } = useTeamsQuery();
   const dispatch = useDispatch();
   const { started, totalGoals, elapsed, matches } = useSelector(
     (state: RootState) => state.match
   );
+
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const matchesRef = useRef(matches);
   const totalGoalsRef = useRef(totalGoals);
@@ -91,6 +94,17 @@ export function useSimulation() {
     }, 0);
   }, [dispatch, startSimulation]);
 
+  const finishSimulation = useCallback(() => {
+    clearSimInterval(intervalRef);
+    dispatch(setTotalGoals(0));
+    dispatch(resetMatches());
+    dispatch(setStarted(false));
+    dispatch(setElapsed(0));
+    if (teams && status === 'success') {
+      dispatch(setMatches(teams));
+    }
+  }, [dispatch, teams, status]);
+
   return {
     started,
     totalGoals,
@@ -98,5 +112,6 @@ export function useSimulation() {
     matches,
     startSimulation,
     restartSimulation,
+    finishSimulation,
   };
 }

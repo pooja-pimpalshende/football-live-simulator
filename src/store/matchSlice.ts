@@ -11,38 +11,7 @@ export interface Match {
   lastScorer?: 'home' | 'away' | null | string;
 }
 
-const initialMatches: Match[] = [
-  {
-    id: 1,
-    homeTeam: 'Germany',
-    awayTeam: 'Poland',
-    homeScore: 0,
-    awayScore: 0,
-    homeFlag: '🇩🇪',
-    awayFlag: '🇵🇱',
-    lastScorer: null,
-  },
-  {
-    id: 2,
-    homeTeam: 'Brazil',
-    awayTeam: 'Mexico',
-    homeScore: 0,
-    awayScore: 0,
-    homeFlag: '🇧🇷',
-    awayFlag: '🇲🇽',
-    lastScorer: null,
-  },
-  {
-    id: 3,
-    homeTeam: 'Argentina',
-    awayTeam: 'Uruguay',
-    homeScore: 0,
-    awayScore: 0,
-    homeFlag: '🇦🇷',
-    awayFlag: '🇺🇾',
-    lastScorer: null,
-  },
-];
+const initialMatches: Match[] = [];
 
 interface MatchState {
   matches: Match[];
