@@ -5,16 +5,20 @@ import {
   resetMatches,
   setElapsed,
   setMatches,
-  setStarted,
+  setSimulationState,
   setTotalGoals,
-} from '../store/matchSlice';
+} from '../store/match.slice';
 import { clearSimInterval } from '../utils';
-import { useTeamsQuery } from './useTeamsQuery';
+
+const MAX_GOALS = 9;
+const MAX_MINUTES = 90;
+const GOAL_INTERVAL = 10;
+const TICK_INTERVAL_MS = 1000;
+const LAST_SCORER_RESET_MS = 1500;
 
 export function useSimulation() {
-  const { data: teams, status } = useTeamsQuery();
   const dispatch = useDispatch();
-  const { started, totalGoals, elapsed, matches } = useSelector(
+  const { simulationState, totalGoals, elapsed, matches } = useSelector(
     (state: RootState) => state.match
   );
 
@@ -28,85 +32,105 @@ export function useSimulation() {
   }, [matches, totalGoals]);
 
   useEffect(() => {
-    if ((totalGoals === 9 || elapsed >= 90) && intervalRef.current) {
+    if (
+      (totalGoals === MAX_GOALS || elapsed >= MAX_MINUTES) &&
+      intervalRef.current
+    ) {
       clearSimInterval(intervalRef);
-      dispatch(setStarted(false));
+      dispatch(setSimulationState('finished'));
     }
-  }, [totalGoals, elapsed, matches, dispatch]);
+  }, [totalGoals, elapsed, dispatch]);
+
+  const resetAllMatches = (matchesList: typeof matches) =>
+    matchesList.map((match) => ({
+      ...match,
+      homeScore: 0,
+      awayScore: 0,
+      lastScorer: null,
+    }));
+
+  const updateMatchWithGoal = (
+    matchesList: typeof matches,
+    matchIndex: number,
+    team: 'homeScore' | 'awayScore'
+  ) =>
+    matchesList.map((match, index) =>
+      index === matchIndex
+        ? {
+            ...match,
+            [team]: match[team] + 1,
+            lastScorer: team === 'homeScore' ? 'home' : 'away',
+          }
+        : { ...match, lastScorer: null }
+    );
+
+  const clearLastScorer = (matchesList: typeof matches) =>
+    matchesList.map((match) => ({
+      ...match,
+      lastScorer: null,
+    }));
 
   const startSimulation = useCallback(() => {
     clearSimInterval(intervalRef);
-    dispatch(
-      setMatches(
-        matches.map((match) => ({
-          ...match,
-          homeScore: 0,
-          awayScore: 0,
-          lastScorer: null,
-        }))
-      )
-    );
-    dispatch(setStarted(true));
+
+    dispatch(setMatches(resetAllMatches(matches)));
+    dispatch(setSimulationState('running'));
     dispatch(setElapsed(0));
     dispatch(setTotalGoals(0));
+
     let seconds = 0;
     intervalRef.current = setInterval(() => {
       seconds += 1;
       dispatch(setElapsed(seconds));
+
       const currentMatches = matchesRef.current;
       const currentTotalGoals = totalGoalsRef.current;
-      if (seconds % 10 === 0 && seconds <= 90 && currentTotalGoals < 9) {
+
+      if (
+        seconds % GOAL_INTERVAL === 0 &&
+        seconds <= MAX_MINUTES &&
+        currentTotalGoals < MAX_GOALS
+      ) {
         const matchIndex = Math.floor(Math.random() * currentMatches.length);
         const team = Math.random() < 0.5 ? 'homeScore' : 'awayScore';
-        const updatedMatches = currentMatches.map((match, index) =>
-          index === matchIndex
-            ? {
-                ...match,
-                [team]: match[team] + 1,
-                lastScorer: team === 'homeScore' ? 'home' : 'away',
-              }
-            : { ...match, lastScorer: null }
+
+        const updatedMatches = updateMatchWithGoal(
+          currentMatches,
+          matchIndex,
+          team
         );
+
         dispatch(setMatches(updatedMatches));
         dispatch(setTotalGoals(currentTotalGoals + 1));
+
         setTimeout(() => {
-          dispatch(
-            setMatches(
-              updatedMatches.map((match) => ({
-                ...match,
-                lastScorer: null,
-              }))
-            )
-          );
-        }, 1500);
+          dispatch(setMatches(clearLastScorer(updatedMatches)));
+        }, LAST_SCORER_RESET_MS);
       }
-    }, 1000);
+    }, TICK_INTERVAL_MS);
   }, [dispatch, matches]);
 
   const restartSimulation = useCallback(() => {
     clearSimInterval(intervalRef);
     dispatch(setTotalGoals(0));
     dispatch(resetMatches());
-    dispatch(setStarted(false));
+    dispatch(setSimulationState('idle'));
     dispatch(setElapsed(0));
-    setTimeout(() => {
-      startSimulation();
-    }, 0);
+    setTimeout(startSimulation, 0);
   }, [dispatch, startSimulation]);
 
   const finishSimulation = useCallback(() => {
     clearSimInterval(intervalRef);
-    dispatch(setTotalGoals(0));
     dispatch(resetMatches());
-    dispatch(setStarted(false));
+    dispatch(setSimulationState('finished'));
     dispatch(setElapsed(0));
-    if (teams && status === 'success') {
-      dispatch(setMatches(teams));
+    if (matches) {
+      dispatch(setMatches(matches));
     }
-  }, [dispatch, teams, status]);
+  }, [dispatch, matches]);
 
   return {
-    started,
+    simulationState,
     totalGoals,
     elapsed,
     matches,

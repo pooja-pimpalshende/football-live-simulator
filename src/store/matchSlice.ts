@@ -11,28 +11,30 @@ export interface Match {
   lastScorer?: 'home' | 'away' | null | string;
 }
 
-const initialMatches: Match[] = [];
+type SimulationState = 'idle' | 'running' | 'finished';
 
 interface MatchState {
   matches: Match[];
   totalGoals: number;
   elapsed: number;
-  started: boolean;
+  simulationState: SimulationState;
 }
+
+const initialMatches: Match[] = [];
 
 const initialState: MatchState = {
   matches: initialMatches,
   totalGoals: 0,
   elapsed: 0,
-  started: false,
+  simulationState: 'idle',
 };
 
 const matchSlice = createSlice({
   name: 'match',
   initialState,
   reducers: {
-    setStarted: (state, action: PayloadAction<boolean>) => {
-      state.started = action.payload;
+    setSimulationState: (state, action: PayloadAction<SimulationState>) => {
+      state.simulationState = action.payload;
     },
     setTotalGoals: (state, action: PayloadAction<number>) => {
       state.totalGoals = action.payload;
@@ -58,7 +60,7 @@ const matchSlice = createSlice({
 });
 
 export const {
-  setStarted,
+  setSimulationState,
   setTotalGoals,
   setElapsed,
   setMatches,

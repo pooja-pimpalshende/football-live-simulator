@@ -1,6 +1,11 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, UseQueryResult } from '@tanstack/react-query';
 
-export function useTeamsQuery() {
+type Team = {
+  name: string;
+  flag: string;
+};
+
+export function useTeamsQuery(): UseQueryResult<Team[]> {
   return useQuery({
     queryKey: ['teams'],
     queryFn: async () => {

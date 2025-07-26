@@ -1,16 +1,16 @@
 import React from 'react';
 import { Card, CardContent, Badge } from '@shadcn-ui';
-import { Match } from '../store/matchSlice';
+import { Match, SimulationState } from '../store/match.slice';
 
 interface MatchCardProps {
   match: Match;
-  started: boolean;
+  simulationState: SimulationState;
   elapsed: number;
 }
 
 export const MatchCard: React.FC<MatchCardProps> = ({
   match,
-  started,
+  simulationState,
   elapsed,
 }) => {
   return (
@@ -64,7 +64,7 @@ export const MatchCard: React.FC<MatchCardProps> = ({
               </span>
             </div>
             <div className={`text-sm ${'text-gray-500'} flex items-center`}>
-              {started ? `${elapsed}'` : "0'"}
+              {simulationState === 'running' ? `${elapsed}'` : "0'"}
               <span role="img" aria-label="clock">
                 ⏰
               </span>{' '}

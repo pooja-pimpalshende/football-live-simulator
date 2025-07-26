@@ -4,36 +4,12 @@ const app = express();
 const port = process.env.PORT || 3000;
 
 const teams = [
-  {
-    id: 1,
-    homeTeam: 'Germany',
-    awayTeam: 'Poland',
-    homeScore: 0,
-    awayScore: 0,
-    homeFlag: '🇩🇪',
-    awayFlag: '🇵🇱',
-    lastScorer: null,
-  },
-  {
-    id: 2,
-    homeTeam: 'Brazil',
-    awayTeam: 'Mexico',
-    homeScore: 0,
-    awayScore: 0,
-    homeFlag: '🇧🇷',
-    awayFlag: '🇲🇽',
-    lastScorer: null,
-  },
-  {
-    id: 3,
-    homeTeam: 'Argentina',
-    awayTeam: 'Uruguay',
-    homeScore: 0,
-    awayScore: 0,
-    homeFlag: '🇦🇷',
-    awayFlag: '🇺🇾',
-    lastScorer: null,
-  },
+  { id: 1, name: 'Germany', flag: '🇩🇪' },
+  { id: 2, name: 'Poland', flag: '🇵🇱' },
+  { id: 3, name: 'Brazil', flag: '🇧🇷' },
+  { id: 4, name: 'Mexico', flag: '🇲🇽' },
+  { id: 5, name: 'Argentina', flag: '🇦🇷' },
+  { id: 6, name: 'Uruguay', flag: '🇺🇾' },
 ];
 
 const results = [
