@@ -1,7 +1,7 @@
 import { act, renderHook } from '@testing-library/react';
 import * as React from 'react';
 
-import UseCombinedMatchesQuery from './useCombinedMatchesQuery';
+import UseCombinedMatchesQuery from './useMatchesData';
 
 describe('UseCombinedMatchesQuery', () => {
   it('should render successfully', () => {

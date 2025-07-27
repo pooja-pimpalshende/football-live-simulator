@@ -1,5 +1,5 @@
 import { fireEvent, screen } from '@testing-library/dom';
-import { ControlPanel } from './control-panel';
+import { ControlPanel } from './ControlPanel';
 import { render } from '@testing-library/react';
 
 vi.mock('@shadcn-ui', () => ({

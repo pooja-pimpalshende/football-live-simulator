@@ -1,11 +1,11 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { renderHook, act } from '@testing-library/react';
+import React, { FC } from 'react';
 import { Provider } from 'react-redux';
 import { configureStore } from '@reduxjs/toolkit';
-import React from 'react';
-import matchReducer, { setTotalGoals } from '../store/matchSlice';
-import { useSimulation } from './useSimulation';
+import { renderHook, act } from '@testing-library/react';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import matchReducer, { setTotalGoals } from '../store/match.slice';
+import { useSimulation } from './useSimulation';
 
 vi.mock('../utils', () => ({
   clearSimInterval: (ref: any) => {
@@ -103,7 +103,7 @@ describe('useSimulation', () => {
       });
     });
 
-    const wrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+    const wrapper: FC<{ children: React.ReactNode }> = ({ children }) => (
       <QueryClientProvider client={queryClient}>
         <Provider store={store}>{children}</Provider>
       </QueryClientProvider>
@@ -120,7 +120,7 @@ describe('useSimulation', () => {
   it('should start simulation and update elapsed time', () => {
     const store = createTestStore();
 
-    const wrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+    const wrapper: FC<{ children: React.ReactNode }> = ({ children }) => (
       <QueryClientProvider client={queryClient}>
         <Provider store={store}>{children}</Provider>
       </QueryClientProvider>
@@ -176,7 +176,7 @@ describe('useSimulation', () => {
       });
     });
 
-    const wrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+    const wrapper: FC<{ children: React.ReactNode }> = ({ children }) => (
       <QueryClientProvider client={queryClient}>
         <Provider store={store}>{children}</Provider>
       </QueryClientProvider>
@@ -203,7 +203,7 @@ describe('useSimulation', () => {
   it('should stop simulation at 90 seconds', () => {
     const store = createTestStore();
 
-    const wrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+    const wrapper: FC<{ children: React.ReactNode }> = ({ children }) => (
       <QueryClientProvider client={queryClient}>
         <Provider store={store}>{children}</Provider>
       </QueryClientProvider>
@@ -231,7 +231,7 @@ describe('useSimulation', () => {
   it('should restart simulation and reset scores', () => {
     const store = createTestStore();
 
-    const wrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+    const wrapper: FC<{ children: React.ReactNode }> = ({ children }) => (
       <QueryClientProvider client={queryClient}>
         <Provider store={store}>{children}</Provider>
       </QueryClientProvider>
@@ -269,7 +269,7 @@ describe('useSimulation', () => {
   it('should stop after 9 goals', () => {
     const store = createTestStore();
 
-    const wrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+    const wrapper: FC<{ children: React.ReactNode }> = ({ children }) => (
       <QueryClientProvider client={queryClient}>
         <Provider store={store}>{children}</Provider>
       </QueryClientProvider>
@@ -298,7 +298,7 @@ describe('useSimulation', () => {
   it('should show only Start Simulation button after finishing', () => {
     const store = createTestStore();
 
-    const wrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+    const wrapper: FC<{ children: React.ReactNode }> = ({ children }) => (
       <QueryClientProvider client={queryClient}>
         <Provider store={store}>{children}</Provider>
       </QueryClientProvider>

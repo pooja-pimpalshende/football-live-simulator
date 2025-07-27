@@ -1,6 +1,7 @@
-import React from 'react';
+import { FC } from 'react';
 import { Button, Progress } from '@shadcn-ui';
-import { SimulationState } from '../store/match.slice';
+import { MAX_MINUTES, SIMULATION_STATES } from '../../constants';
+import { SimulationState } from '../../store';
 
 interface ControlPanelProps {
   simulationState: SimulationState;
@@ -11,9 +12,8 @@ interface ControlPanelProps {
   onFinish: () => void;
 }
 
-export const ControlPanel: React.FC<ControlPanelProps> = ({
+export const ControlPanel: FC<ControlPanelProps> = ({
   simulationState,
-  totalGoals,
   elapsed,
   onStart,
   onRestart,
@@ -21,19 +21,19 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
 }) => {
   const getButtonConfig = () => {
     switch (simulationState) {
-      case 'idle':
+      case SIMULATION_STATES.IDLE:
         return {
           text: 'Start Simulation',
           color: 'bg-green-600 hover:bg-green-700',
           action: onStart,
         };
-      case 'running':
+      case SIMULATION_STATES.RUNNING:
         return {
           text: 'Finish Simulation',
           color: 'bg-red-600 hover:bg-red-700',
           action: onFinish,
         };
-      case 'finished':
+      case SIMULATION_STATES.FINISHED:
         return {
           text: 'Restart Simulation',
           color: 'bg-blue-600 hover:bg-blue-700',
@@ -64,13 +64,16 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
           </Button>
         </div>
 
-        {simulationState === 'running' && (
+        {(simulationState === SIMULATION_STATES.RUNNING ||
+          simulationState === SIMULATION_STATES.FINISHED) && (
           <div className="w-full mt-4">
             <Progress
               className="transition-all duration-700"
-              value={(elapsed / 90) * 100}
+              value={(elapsed / MAX_MINUTES) * 100}
             />
-            <div className="text-xs text-gray-500 mt-1">{elapsed} / 90 sec</div>
+            <div className="text-xs text-gray-500 mt-1">
+              {elapsed} / {MAX_MINUTES} sec
+            </div>
           </div>
         )}
       </div>

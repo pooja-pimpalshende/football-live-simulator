@@ -1,7 +1,7 @@
-import React from 'react';
-import { useSimulation } from '../hooks';
+import { FC } from 'react';
+import { useSimulation } from '../../hooks';
 
-export const Header: React.FC = () => {
+export const Header: FC = () => {
   const { totalGoals } = useSimulation();
   return (
     <header className={`${'bg-white border-gray-200'} border-b shadow-sm`}>
@@ -14,17 +14,18 @@ export const Header: React.FC = () => {
             Football Live
           </h1>
         </div>
-        <div className="flex items-center space-x-6">
-          <div className="flex items-center space-x-2">
-            <i className="fas fa-trophy text-yellow-500"></i>
-            <span role="img" aria-label="trophy">
-              🏆
-            </span>{' '}
-            <span data-testid="total-goals" className="text-lg font-semibold">
-              Total Goals: {totalGoals}
-            </span>
+        {totalGoals > 0 && (
+          <div className="flex items-center space-x-6">
+            <div className="flex items-center space-x-2">
+              <span role="img" aria-label="trophy">
+                🏆
+              </span>{' '}
+              <span data-testid="total-goals" className="text-lg font-semibold">
+                Total Goals: {totalGoals}
+              </span>
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </header>
   );

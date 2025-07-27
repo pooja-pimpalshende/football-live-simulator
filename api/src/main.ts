@@ -44,19 +44,6 @@ app.get('/api/results', (_req, res) => {
   res.json(results);
 });
 
-app.use(express.json());
-app.post('/api/results', (req, res) => {
-  const { matchId, homeScore, awayScore } = req.body;
-  const match = results.find((m) => m.matchId === matchId);
-  if (match) {
-    match.homeScore = homeScore;
-    match.awayScore = awayScore;
-    res.json(match);
-  } else {
-    res.status(404).json({ error: 'Match not found' });
-  }
-});
-
 app.listen(port, () => {
   console.log(`API server running at http://localhost:${port}`);
 });

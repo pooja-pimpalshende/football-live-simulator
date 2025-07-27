@@ -1,29 +1,24 @@
-import React from 'react';
+import { FC } from 'react';
 import { Card, CardContent, Badge } from '@shadcn-ui';
-import { Match, SimulationState } from '../store/match.slice';
+import { Match } from '../../store';
+import { AWAY, HOME } from '../../constants';
 
 interface MatchCardProps {
   match: Match;
-  simulationState: SimulationState;
-  elapsed: number;
 }
 
-export const MatchCard: React.FC<MatchCardProps> = ({
-  match,
-  simulationState,
-  elapsed,
-}) => {
+export const MatchCard: FC<MatchCardProps> = ({ match }) => {
   return (
     <Card
       data-testid="match-score"
-      className={`${'bg-white border-gray-200'} shadow-lg hover:shadow-xl transition-all duration-300`}
+      className={`bg-white border-gray-200 shadow-lg hover:shadow-xl transition-all duration-300`}
     >
       <CardContent className="p-6">
         <div className="flex items-center justify-between">
           {/* Home Team */}
           <div
             className={`flex items-center space-x-3 flex-1 ${
-              match.lastScorer === 'home' ? 'animate-pulse' : ''
+              match.lastScorer === HOME ? 'animate-pulse' : ''
             }`}
           >
             <span
@@ -34,7 +29,7 @@ export const MatchCard: React.FC<MatchCardProps> = ({
               {match.homeFlag}
             </span>
             <span className="text-xl font-bold">{match.homeTeam}</span>
-            {match.lastScorer === 'home' && (
+            {match.lastScorer === HOME && (
               <Badge className="bg-orange-500 text-white animate-bounce">
                 GOAL!
               </Badge>
@@ -44,39 +39,33 @@ export const MatchCard: React.FC<MatchCardProps> = ({
           <div className="flex flex-col items-center mx-8">
             <div className="text-4xl font-bold text-center mb-2">
               <span
-                className={`$ {
-                match.lastScorer === 'home'
-                  ? 'text-orange-500'
-                  : 'text-gray-900'
-              }`}
+                className={`${
+                  match.lastScorer === HOME
+                    ? 'text-orange-500'
+                    : 'text-gray-900'
+                }`}
               >
                 {match.homeScore}
               </span>
               <span className={`mx-4 ${'text-gray-500'}`}>:</span>
               <span
-                className={`$ {
-                match.lastScorer === 'away'
-                  ? 'text-orange-500'
-                  : 'text-gray-900'
-              }`}
+                className={`${
+                  match.lastScorer === AWAY
+                    ? 'text-orange-500'
+                    : 'text-gray-900'
+                }`}
               >
                 {match.awayScore}
               </span>
-            </div>
-            <div className={`text-sm ${'text-gray-500'} flex items-center`}>
-              {simulationState === 'running' ? `${elapsed}'` : "0'"}
-              <span role="img" aria-label="clock">
-                ⏰
-              </span>{' '}
             </div>
           </div>
           {/* Away Team */}
           <div
             className={`flex items-center space-x-3 flex-1 justify-end ${
-              match.lastScorer === 'away' ? 'animate-pulse' : ''
+              match.lastScorer === AWAY ? 'animate-pulse' : ''
             }`}
           >
-            {match.lastScorer === 'away' && (
+            {match.lastScorer === AWAY && (
               <Badge className="bg-orange-500 text-white animate-bounce">
                 GOAL!
               </Badge>

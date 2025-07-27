@@ -1,4 +1,7 @@
-export { ControlPanel } from './control-panel';
-export { Footer } from './footer';
-export { Header } from './header';
-export { MatchCard } from './match-card';
+export * from './ControlPanel/ControlPanel';
+export * from './Header/Header';
+export * from './Footer/Footer';
+export * from './MatchSimulator/MatchSimulator';
+export * from './MatchCard/MatchCard';
+export * from './MatchCardSkeleton';
+export * from './ErrorCard';

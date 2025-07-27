@@ -1,9 +1,10 @@
 import { createRouter, RouterProvider } from '@tanstack/react-router';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import * as ReactDOM from 'react-dom/client';
 import { Provider } from 'react-redux';
 import { store } from './store/store';
 import { routeTree } from './routes/route';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 const queryClient = new QueryClient();
 
@@ -24,5 +25,6 @@ root.render(
     <Provider store={store}>
       <RouterProvider router={router} />
     </Provider>
+    <ReactQueryDevtools initialIsOpen={false} />
   </QueryClientProvider>
 );

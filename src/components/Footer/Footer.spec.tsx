@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react';
-import { Footer } from './footer';
+import { Footer } from './Footer';
 
 describe('Footer', () => {
   it('renders copyright notice', () => {

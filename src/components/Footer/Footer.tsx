@@ -1,6 +1,6 @@
-import React from 'react';
+import { FC } from 'react';
 
-export const Footer: React.FC = () => (
+export const Footer: FC = () => (
   <footer className={`${'bg-white border-gray-200'} border-t mt-28`}>
     <div className="max-w-6xl mx-auto px-6 py-6 text-center">
       <p className={`text-sm ${'text-gray-500'}`}>

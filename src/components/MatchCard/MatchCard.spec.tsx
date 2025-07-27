@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react';
-import { MatchCard } from './match-card';
+import { MatchCard } from './MatchCard';
 
 const mockMatch = {
   id: 1,
