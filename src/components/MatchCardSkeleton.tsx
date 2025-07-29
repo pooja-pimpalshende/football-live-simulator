@@ -1,7 +1,10 @@
 import { Card, CardContent, Skeleton } from '@shadcn-ui';
 
 export const MatchCardSkeleton = () => (
-  <Card className="bg-white border-gray-200 shadow-lg hover:shadow-xl transition-all duration-300">
+  <Card
+    data-testid="match-score-skeleton"
+    className="bg-white border-gray-200 shadow-lg hover:shadow-xl transition-all duration-300"
+  >
     <CardContent className="p-6">
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-3 flex-1">

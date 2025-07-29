@@ -1,5 +1,6 @@
+import { UnknownAction } from '@reduxjs/toolkit';
 import { MAX_MINUTES } from '../constants';
-import { Match } from '../store';
+import { AppDispatch, Match, UpdateSimulationStatePayload } from '../store';
 import { clearLastScorer, updateMatchWithGoal } from './matchUtils';
 
 const GOAL_INTERVAL = 10;
@@ -10,13 +11,11 @@ type RunSimulationIntervalArguments = {
   intervalRef: React.RefObject<ReturnType<typeof setInterval> | null>;
   matchesRef: React.RefObject<Match[]>;
   totalGoalsRef: React.RefObject<number>;
-  dispatch: React.Dispatch<any>;
-  updateSimulationState: (state: any) => void;
+  dispatch: AppDispatch;
+  updateSimulationState: (state: UpdateSimulationStatePayload) => UnknownAction;
 };
 
-export function clearSimInterval(
-  ref: React.RefObject<ReturnType<typeof setInterval> | null>
-) {
+export function clearSimInterval(ref: React.RefObject<ReturnType<typeof setInterval> | null>) {
   if (ref.current) {
     clearInterval(ref.current);
     ref.current = null;
@@ -41,23 +40,17 @@ export function runSimulationInterval({
       const matchIndex = Math.floor(Math.random() * currentMatches.length);
       const team = Math.random() < 0.5 ? 'homeScore' : 'awayScore';
 
-      const updatedMatches = updateMatchWithGoal(
-        currentMatches,
-        matchIndex,
-        team
-      );
+      const updatedMatches = updateMatchWithGoal(currentMatches, matchIndex, team);
 
       dispatch(
         updateSimulationState({
           matches: updatedMatches,
           totalGoals: currentTotalGoals + 1,
-        })
+        }),
       );
 
       setTimeout(() => {
-        dispatch(
-          updateSimulationState({ matches: clearLastScorer(updatedMatches) })
-        );
+        dispatch(updateSimulationState({ matches: clearLastScorer(updatedMatches) }));
       }, GOAL_HIGHLIGHT_DURATION_MS);
     }
 
@@ -69,7 +62,7 @@ export function runSimulationInterval({
         updateSimulationState({
           simulationState: 'finished',
           elapsed: seconds,
-        })
+        }),
       );
       return;
     }

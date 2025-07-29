@@ -8,7 +8,7 @@ export type Results = {
   awayScore: number;
 };
 
-export function UseResultsQuery(): UseQueryResult<Results[]> {
+export function useResultsQuery(): UseQueryResult<Results[]> {
   return useQuery({
     queryKey: ['results'],
     queryFn: async () => {

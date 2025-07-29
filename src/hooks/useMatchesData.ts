@@ -2,20 +2,12 @@ import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { updateSimulationState } from '../store';
 import { useTeamsQuery } from './useTeamsQuery';
-import { UseResultsQuery } from './useResultsQuery';
+import { useResultsQuery } from './useResultsQuery';
 
 export function useMatchesData() {
-  const {
-    data: teams,
-    isPending: teamsPending,
-    error: teamsError,
-  } = useTeamsQuery();
+  const { data: teams, isPending: teamsPending, error: teamsError } = useTeamsQuery();
 
-  const {
-    data: results,
-    isPending: resultsPending,
-    error: resultsError,
-  } = UseResultsQuery();
+  const { data: results, isPending: resultsPending, error: resultsError } = useResultsQuery();
 
   const dispatch = useDispatch();
 
@@ -36,7 +28,6 @@ export function useMatchesData() {
         lastScorer: null,
       };
     });
-
     dispatch(updateSimulationState({ matches }));
   }, [teams, dispatch, results]);
 

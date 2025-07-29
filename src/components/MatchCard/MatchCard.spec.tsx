@@ -9,29 +9,34 @@ const mockMatch = {
   awayScore: 1,
   homeFlag: '🇦🇷',
   awayFlag: '🇧🇷',
-  lastScorer: 'home',
+  lastScorer: '',
 };
 
 describe('MatchCard', () => {
   it('renders match info and score', () => {
-    render(<MatchCard match={mockMatch} started={true} elapsed={45} />);
+    render(<MatchCard match={{ ...mockMatch, lastScorer: 'home' }} />);
     expect(screen.getByText('Team A')).toBeInTheDocument();
     expect(screen.getByText('Team B')).toBeInTheDocument();
     expect(screen.getByText('2')).toBeInTheDocument();
     expect(screen.getByText('1')).toBeInTheDocument();
-    expect(screen.getByText("45'")).toBeInTheDocument();
     expect(screen.getByText('🇦🇷')).toBeInTheDocument();
     expect(screen.getByText('🇧🇷')).toBeInTheDocument();
     expect(screen.getByText('GOAL!')).toBeInTheDocument();
   });
 
-  it('shows clock emjoi', () => {
-    render(<MatchCard match={mockMatch} started={true} elapsed={45} />);
-    expect(screen.getByRole('img', { name: 'clock' })).toBeInTheDocument();
+  it('shows GOAL! badge for home scorer', () => {
+    render(<MatchCard match={{ ...mockMatch, lastScorer: 'home' }} />);
+    expect(screen.getByText('GOAL!')).toBeInTheDocument();
   });
 
-  it('shows 0 when match not started', () => {
-    render(<MatchCard match={mockMatch} started={false} elapsed={0} />);
-    expect(screen.getByText("0'")).toBeInTheDocument();
+  it('shows GOAL! badge for away scorer', () => {
+    render(<MatchCard match={{ ...mockMatch, lastScorer: 'away' }} />);
+    expect(screen.getByText('GOAL!')).toBeInTheDocument();
+  });
+
+  it('renders correct score colors for home scorer', () => {
+    render(<MatchCard match={{ ...mockMatch, lastScorer: 'home' }} />);
+    const homeScore = screen.getByText('2');
+    expect(homeScore).toHaveClass('text-orange-500');
   });
 });

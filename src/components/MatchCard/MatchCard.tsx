@@ -21,39 +21,25 @@ export const MatchCard: FC<MatchCardProps> = ({ match }) => {
               match.lastScorer === HOME ? 'animate-pulse' : ''
             }`}
           >
-            <span
-              role="img"
-              aria-label="country-flag"
-              className={`${match.homeFlag} text-2xl`}
-            >
+            <span role="img" aria-label="country-flag" className={`${match.homeFlag} text-2xl`}>
               {match.homeFlag}
             </span>
             <span className="text-xl font-bold">{match.homeTeam}</span>
             {match.lastScorer === HOME && (
-              <Badge className="bg-orange-500 text-white animate-bounce">
-                GOAL!
-              </Badge>
+              <Badge className="bg-orange-500 text-white animate-bounce">GOAL!</Badge>
             )}
           </div>
           {/* Score */}
           <div className="flex flex-col items-center mx-8">
             <div className="text-4xl font-bold text-center mb-2">
               <span
-                className={`${
-                  match.lastScorer === HOME
-                    ? 'text-orange-500'
-                    : 'text-gray-900'
-                }`}
+                className={`${match.lastScorer === HOME ? 'text-orange-500' : 'text-gray-900'}`}
               >
                 {match.homeScore}
               </span>
               <span className={`mx-4 ${'text-gray-500'}`}>:</span>
               <span
-                className={`${
-                  match.lastScorer === AWAY
-                    ? 'text-orange-500'
-                    : 'text-gray-900'
-                }`}
+                className={`${match.lastScorer === AWAY ? 'text-orange-500' : 'text-gray-900'}`}
               >
                 {match.awayScore}
               </span>
@@ -66,16 +52,10 @@ export const MatchCard: FC<MatchCardProps> = ({ match }) => {
             }`}
           >
             {match.lastScorer === AWAY && (
-              <Badge className="bg-orange-500 text-white animate-bounce">
-                GOAL!
-              </Badge>
+              <Badge className="bg-orange-500 text-white animate-bounce">GOAL!</Badge>
             )}
             <span className="text-xl font-bold">{match.awayTeam}</span>
-            <span
-              role="img"
-              aria-label="country-flag"
-              className={`${match.awayFlag} text-2xl`}
-            >
+            <span role="img" aria-label="country-flag" className={`${match.awayFlag} text-2xl`}>
               {match.awayFlag}
             </span>
           </div>

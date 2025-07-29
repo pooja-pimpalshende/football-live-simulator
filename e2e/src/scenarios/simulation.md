@@ -7,10 +7,21 @@ Scenario: Start match simulation
 - Then simulation start
 - Then I see "Finish" button
 - Then every 10 sec, random team can score 1 goal
-- And Total goals increase
-- After 90 sec or on "Finish" simulation ends
+- When the first goal is scored, I see "Total Goals" displayed and it starts increasing
+- After 90 sec
 - Then I can see "Restart" button
 - After clicking "Restart"
 - Then all match scores are reset to 0:0
 - And the total goals is 0
 - Simulation starts again
+
+Scenario: End simulation before 90 seconds
+
+- I visit the home page
+- I click "Start"
+- I see "Finish" button
+- I click "Finish" before 90 seconds
+- Then simulation ends immediately
+- I see "Restart" button
+- No more goals are scored after finishing
+- I can see the progress bar and the total goals as they were at the moment I clicked "Finish"

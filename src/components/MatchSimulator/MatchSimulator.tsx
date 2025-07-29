@@ -6,8 +6,7 @@ import { MatchCardSkeleton } from '../MatchCardSkeleton';
 import { ErrorCard } from '../ErrorCard';
 
 export const MatchSimulation = () => {
-  const { teamsPending, teamsError, resultsPending, resultsError } =
-    useMatchesData();
+  const { teamsPending, teamsError, resultsPending, resultsError } = useMatchesData();
 
   if (teamsPending || resultsPending)
     return (
@@ -17,8 +16,7 @@ export const MatchSimulation = () => {
         <MatchCardSkeleton />
       </div>
     );
-  if (teamsError || resultsError)
-    return <ErrorCard message="Failed to load matches" />;
+  if (teamsError || resultsError) return <ErrorCard message="Failed to load matches" />;
 
   return <MatchSimulatorContainer />;
 };

@@ -5,3 +5,4 @@ export * from './MatchSimulator/MatchSimulator';
 export * from './MatchCard/MatchCard';
 export * from './MatchCardSkeleton';
 export * from './ErrorCard';
+export * from './NotFound';

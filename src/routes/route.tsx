@@ -1,7 +1,8 @@
 import { createRootRoute, createRoute } from '@tanstack/react-router';
-import { App } from '../app/app';
-import { MatchSimulation } from '../components/MatchSimulator/MatchSimulator';
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools';
+import { MatchSimulation } from '../components/MatchSimulator/MatchSimulator';
+import { NotFound } from '../components/';
+import { App } from '../app/app';
 
 const rootRoute = createRootRoute({
   component: () => (
@@ -18,4 +19,10 @@ const indexRoute = createRoute({
   component: MatchSimulation,
 });
 
-export const routeTree = rootRoute.addChildren([indexRoute]);
+const catchAllRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '$',
+  component: NotFound,
+});
+
+export const routeTree = rootRoute.addChildren([indexRoute, catchAllRoute]);

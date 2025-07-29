@@ -6,10 +6,7 @@ module.exports = {
   darkMode: ['class'],
   content: [
     './lib/shadcn-ui/**/*.{js,ts,jsx,tsx}',
-    join(
-      __dirname,
-      '{src,pages,components,app}/**/*!(*.stories|*.spec).{ts,tsx,html}'
-    ),
+    join(__dirname, '{src,pages,components,app}/**/*!(*.stories|*.spec).{ts,tsx,html}'),
     ...createGlobPatternsForDependencies(__dirname),
   ],
   theme: {

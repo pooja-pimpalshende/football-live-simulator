@@ -1,73 +1,41 @@
-import { render } from '@testing-library/react';
-import { BrowserRouter } from 'react-router-dom';
-import { Provider } from 'react-redux';
-import { store } from '../store/store';
-
-import { App } from './app';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { render, screen } from '@testing-library/react';
+import { Provider } from 'react-redux';
+import { createRootRoute, createRoute, createRouter, RouterProvider } from '@tanstack/react-router';
+import { store } from '../store/store';
+import { App } from './app';
 
 const queryClient = new QueryClient();
 
-vi.mock('../hooks/useTeamsQuery', () => ({
-  useTeamsQuery: () => ({
-    data: [
-      {
-        id: 1,
-        home: 'A',
-        away: 'B',
-        homeScore: 0,
-        awayScore: 0,
-        lastScorer: null,
-      },
-      {
-        id: 2,
-        home: 'C',
-        away: 'D',
-        homeScore: 0,
-        awayScore: 0,
-        lastScorer: null,
-      },
-      {
-        id: 3,
-        home: 'E',
-        away: 'F',
-        homeScore: 0,
-        awayScore: 0,
-        lastScorer: null,
-      },
-    ],
-    status: 'success',
-    isPending: false,
-    error: null,
-  }),
-}));
+const rootRoute = createRootRoute({
+  component: App,
+});
+
+const route = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/',
+});
+const router = createRouter({ routeTree: rootRoute.addChildren([route]) });
 
 describe('App', () => {
   it('should render successfully', () => {
-    const { baseElement } = render(
+    render(
       <QueryClientProvider client={queryClient}>
         <Provider store={store}>
-          <BrowserRouter>
-            <App />
-          </BrowserRouter>
+          <RouterProvider router={router} />
         </Provider>
-      </QueryClientProvider>
+      </QueryClientProvider>,
     );
-    expect(baseElement).toBeTruthy();
   });
 
-  it('should have a greeting as the title', () => {
-    const { getAllByText } = render(
+  it('should have the title', () => {
+    render(
       <QueryClientProvider client={queryClient}>
         <Provider store={store}>
-          <BrowserRouter>
-            <App />
-          </BrowserRouter>
+          <RouterProvider router={router} />
         </Provider>
-      </QueryClientProvider>
+      </QueryClientProvider>,
     );
-    expect(
-      getAllByText(new RegExp('Football Live', 'gi')).length > 0
-    ).toBeTruthy();
+    expect(screen.getByText(/Football Live/i)).toBeInTheDocument();
   });
 });

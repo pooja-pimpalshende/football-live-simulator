@@ -12,7 +12,7 @@ export const resetAllMatches = (matches: Match[]): Match[] =>
 export const updateMatchWithGoal = (
   matches: Match[],
   matchIndex: number,
-  team: 'homeScore' | 'awayScore'
+  team: 'homeScore' | 'awayScore',
 ): Match[] =>
   matches.map((match, index) =>
     index === matchIndex
@@ -21,7 +21,7 @@ export const updateMatchWithGoal = (
           [team]: match[team] + 1,
           lastScorer: team === 'homeScore' ? HOME : AWAY,
         }
-      : { ...match, lastScorer: null }
+      : { ...match, lastScorer: null },
   );
 
 export const clearLastScorer = (matches: Match[]): Match[] =>

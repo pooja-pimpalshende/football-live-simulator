@@ -12,14 +12,15 @@ export interface Match {
   lastScorer?: typeof HOME | typeof AWAY | null;
 }
 
-export type SimulationState =
-  (typeof SIMULATION_STATES)[keyof typeof SIMULATION_STATES];
+export type SimulationState = (typeof SIMULATION_STATES)[keyof typeof SIMULATION_STATES];
 interface MatchState {
   matches: Match[];
   totalGoals: number;
   elapsed: number;
   simulationState: SimulationState;
 }
+
+export type UpdateSimulationStatePayload = Partial<MatchState>;
 
 const initialMatches: Match[] = [];
 
@@ -34,10 +35,7 @@ const matchSlice = createSlice({
   name: 'match',
   initialState,
   reducers: {
-    updateSimulationState: (
-      state,
-      action: PayloadAction<Partial<MatchState>>
-    ) => {
+    updateSimulationState: (state, action: PayloadAction<UpdateSimulationStatePayload>) => {
       Object.assign(state, action.payload);
     },
   },

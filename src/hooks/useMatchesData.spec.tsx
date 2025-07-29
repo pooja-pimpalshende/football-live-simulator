@@ -1,18 +1,118 @@
-import { act, renderHook } from '@testing-library/react';
-import * as React from 'react';
+import * as reactRedux from 'react-redux';
+import { renderHook } from '@testing-library/react';
+import { updateSimulationState } from '../store';
+import { useMatchesData } from './useMatchesData';
+import { Mock } from 'vitest';
+import { useTeamsQuery } from './useTeamsQuery';
+import { useResultsQuery } from './useResultsQuery';
 
-import UseCombinedMatchesQuery from './useMatchesData';
+vi.mock('react-redux', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('react-redux')>();
+  return {
+    ...actual,
+    useDispatch: vi.fn(() => vi.fn()),
+  };
+});
+
+vi.mock('../store', () => ({
+  updateSimulationState: vi.fn((payload) => ({
+    type: 'updateSimulationState',
+    payload,
+  })),
+}));
+
+vi.mock('./useTeamsQuery', () => ({
+  useTeamsQuery: vi.fn(),
+}));
+vi.mock('./useResultsQuery', () => ({
+  useResultsQuery: vi.fn(),
+}));
+
+const mockUseTeamsQuery = useTeamsQuery as unknown as Mock;
+const mockUseResultsQuery = useResultsQuery as unknown as Mock;
 
 describe('UseCombinedMatchesQuery', () => {
-  it('should render successfully', () => {
-    const { result } = renderHook(() => UseCombinedMatchesQuery());
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
 
-    expect(result.current.count).toBe(0);
-
-    act(() => {
-      result.current.increment();
+  it('should return loading and error states from queries', () => {
+    mockUseTeamsQuery.mockReturnValue({
+      data: null,
+      isPending: true,
+      error: null,
+    });
+    mockUseResultsQuery.mockReturnValue({
+      data: null,
+      isPending: false,
+      error: 'Some error',
     });
 
-    expect(result.current.count).toBe(1);
+    const { result } = renderHook(() => useMatchesData());
+
+    expect(result.current.teamsPending).toBe(true);
+    expect(result.current.teamsError).toBe(null);
+    expect(result.current.resultsPending).toBe(false);
+    expect(result.current.resultsError).toBe('Some error');
+  });
+
+  it('should dispatch updateSimulationState with correct matches when teams and results are loaded', () => {
+    const teams = [
+      { name: 'A', flag: '🇦🇷' },
+      { name: 'B', flag: '🇧🇷' },
+    ];
+    const results = [{ homeTeam: 'A', awayTeam: 'B', homeScore: 2, awayScore: 1 }];
+
+    mockUseTeamsQuery.mockReturnValue({
+      data: teams,
+      isPending: false,
+      error: null,
+    });
+    mockUseResultsQuery.mockReturnValue({
+      data: results,
+      isPending: false,
+      error: null,
+    });
+
+    const dispatch = vi.fn();
+    vi.spyOn(reactRedux, 'useDispatch').mockReturnValue(dispatch);
+
+    renderHook(() => useMatchesData());
+
+    expect(updateSimulationState).toHaveBeenCalledWith({
+      matches: [
+        {
+          id: 1,
+          homeTeam: 'A',
+          awayTeam: 'B',
+          homeScore: 2,
+          awayScore: 1,
+          homeFlag: '🇦🇷',
+          awayFlag: '🇧🇷',
+          lastScorer: null,
+        },
+      ],
+    });
+    expect(dispatch).toHaveBeenCalled();
+  });
+
+  it('should not dispatch if teams or results are missing', () => {
+    mockUseTeamsQuery.mockReturnValue({
+      data: null,
+      isPending: false,
+      error: null,
+    });
+    mockUseResultsQuery.mockReturnValue({
+      data: null,
+      isPending: false,
+      error: null,
+    });
+
+    const dispatch = vi.fn();
+    vi.spyOn(reactRedux, 'useDispatch').mockReturnValue(dispatch);
+
+    renderHook(() => useMatchesData());
+
+    expect(dispatch).not.toHaveBeenCalled();
   });
 });

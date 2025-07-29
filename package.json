@@ -9,8 +9,13 @@
     "start:app": "nx run-many --target=serve --projects=api,football-live-simulator --parallel",
     "build": "nx build",
     "test": "nx test",
-    "e2e:ui": "npx nx e2e e2e --ui",
-    "e2e:watch": "nodemon --watch apps/e2e/src --ext ts --exec \"npm run e2e:ui\""
+    "e2e": "nx e2e e2e",
+    "e2e:ui": "nx e2e e2e --ui",
+    "e2e:watch": "nodemon --watch apps/e2e/src --ext ts --exec \"npm run e2e:ui\"",
+    "format:check": "prettier --list-different ./",
+    "format": "prettier --write ./",
+    "lint": "nx lint football-live-simulator",
+    "lint:fix": "nx lint football-live-simulator --fix"
   },
   "nx": {
     "includedScripts": []
@@ -59,6 +64,7 @@
     "@testing-library/dom": "10.4.0",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "16.1.0",
+    "@types/eslint": "^9.6.1",
     "@types/express": "^4.17.21",
     "@types/node": "^20.19.9",
     "@types/react": "19.0.0",
@@ -68,6 +74,7 @@
     "@vitest/ui": "^3.0.0",
     "ajv": "^8.0.0",
     "autoprefixer": "10.4.13",
+    "concurrently": "^9.2.0",
     "esbuild": "^0.19.2",
     "eslint": "^9.8.0",
     "eslint-config-prettier": "^10.0.0",

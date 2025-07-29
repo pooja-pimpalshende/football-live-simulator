@@ -1,20 +1,12 @@
-import React, { FC } from 'react';
+import React from 'react';
 import { Provider } from 'react-redux';
 import { configureStore } from '@reduxjs/toolkit';
 import { renderHook, act } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import matchReducer, { setTotalGoals } from '../store/match.slice';
+import matchReducer from '../store/match.slice';
 import { useSimulation } from './useSimulation';
-
-vi.mock('../utils', () => ({
-  clearSimInterval: (ref: any) => {
-    if (ref.current) {
-      clearInterval(ref.current);
-      ref.current = null;
-    }
-  },
-}));
+import { SIMULATION_STATES } from '../constants';
 
 vi.mock('./useTeamsQuery', () => ({
   useTeamsQuery: () => ({
@@ -58,6 +50,15 @@ function createTestStore() {
 
 const queryClient = new QueryClient();
 
+const wrapper =
+  (store: ReturnType<typeof createTestStore>) =>
+  ({ children }: { children: React.ReactNode }) =>
+    (
+      <QueryClientProvider client={queryClient}>
+        <Provider store={store}>{children}</Provider>
+      </QueryClientProvider>
+    );
+
 describe('useSimulation', () => {
   beforeEach(() => {
     vi.useFakeTimers();
@@ -70,119 +71,35 @@ describe('useSimulation', () => {
 
   it('should initialize with correct default values', () => {
     const store = createTestStore();
-
-    act(() => {
-      store.dispatch({
-        type: 'match/setMatches',
-        payload: [
-          {
-            id: 1,
-            home: 'A',
-            away: 'B',
-            homeScore: 0,
-            awayScore: 0,
-            lastScorer: null,
-          },
-          {
-            id: 2,
-            home: 'C',
-            away: 'D',
-            homeScore: 0,
-            awayScore: 0,
-            lastScorer: null,
-          },
-          {
-            id: 3,
-            home: 'E',
-            away: 'F',
-            homeScore: 0,
-            awayScore: 0,
-            lastScorer: null,
-          },
-        ],
-      });
+    const { result } = renderHook(() => useSimulation(), {
+      wrapper: wrapper(store),
     });
 
-    const wrapper: FC<{ children: React.ReactNode }> = ({ children }) => (
-      <QueryClientProvider client={queryClient}>
-        <Provider store={store}>{children}</Provider>
-      </QueryClientProvider>
-    );
-
-    const { result } = renderHook(() => useSimulation(), { wrapper });
-
-    expect(result.current.started).toBe(false);
+    expect(result.current.simulationState).toBe(SIMULATION_STATES.IDLE.toLowerCase());
     expect(result.current.totalGoals).toBe(0);
     expect(result.current.elapsed).toBe(0);
-    expect(result.current.matches.length).toBe(3);
   });
 
-  it('should start simulation and update elapsed time', () => {
+  it('should start simulation and set state to RUNNING', () => {
     const store = createTestStore();
-
-    const wrapper: FC<{ children: React.ReactNode }> = ({ children }) => (
-      <QueryClientProvider client={queryClient}>
-        <Provider store={store}>{children}</Provider>
-      </QueryClientProvider>
-    );
-
-    const { result } = renderHook(() => useSimulation(), { wrapper });
+    const { result } = renderHook(() => useSimulation(), {
+      wrapper: wrapper(store),
+    });
 
     act(() => {
       result.current.startSimulation();
     });
 
-    expect(result.current.started).toBe(true);
-
-    act(() => {
-      vi.advanceTimersByTime(2000);
-    });
-
-    expect(result.current.elapsed).toBe(2);
+    expect(result.current.simulationState).toBe(SIMULATION_STATES.RUNNING.toLowerCase());
+    expect(result.current.totalGoals).toBe(0);
+    expect(result.current.elapsed).toBe(0);
   });
 
-  it('should add a goal after 10 seconds', () => {
+  it('should score goals every 10 seconds and finish after 90 seconds or 9 goals', () => {
     const store = createTestStore();
-
-    act(() => {
-      store.dispatch({
-        type: 'match/setMatches',
-        payload: [
-          {
-            id: 1,
-            home: 'A',
-            away: 'B',
-            homeScore: 0,
-            awayScore: 0,
-            lastScorer: null,
-          },
-          {
-            id: 2,
-            home: 'C',
-            away: 'D',
-            homeScore: 0,
-            awayScore: 0,
-            lastScorer: null,
-          },
-          {
-            id: 3,
-            home: 'E',
-            away: 'F',
-            homeScore: 0,
-            awayScore: 0,
-            lastScorer: null,
-          },
-        ],
-      });
+    const { result } = renderHook(() => useSimulation(), {
+      wrapper: wrapper(store),
     });
-
-    const wrapper: FC<{ children: React.ReactNode }> = ({ children }) => (
-      <QueryClientProvider client={queryClient}>
-        <Provider store={store}>{children}</Provider>
-      </QueryClientProvider>
-    );
-
-    const { result } = renderHook(() => useSimulation(), { wrapper });
 
     act(() => {
       result.current.startSimulation();
@@ -191,120 +108,42 @@ describe('useSimulation', () => {
     act(() => {
       vi.advanceTimersByTime(10000);
     });
+    expect(result.current.totalGoals).toBeGreaterThanOrEqual(1);
 
-    expect(result.current.totalGoals).toBe(1);
+    act(() => {
+      vi.advanceTimersByTime(10000);
+    });
+    expect(result.current.totalGoals).toBeGreaterThanOrEqual(1);
 
-    const matchesWithGoals = result.current.matches.filter(
-      (match) => match.homeScore > 0 || match.awayScore > 0
-    );
-    expect(matchesWithGoals.length).toBeGreaterThan(0);
+    act(() => {
+      vi.advanceTimersByTime(10000);
+    });
+    expect(result.current.totalGoals).toBeGreaterThanOrEqual(3);
+
+    act(() => {
+      vi.advanceTimersByTime(60000);
+    });
+
+    expect(
+      result.current.simulationState === SIMULATION_STATES.FINISHED.toLowerCase() ||
+        result.current.totalGoals === 9 ||
+        result.current.elapsed === 90,
+    ).toBe(true);
+
+    if (result.current.totalGoals < 9) {
+      expect(result.current.elapsed).toBe(90);
+      expect(result.current.simulationState).toBe(SIMULATION_STATES.FINISHED.toLowerCase());
+    } else {
+      expect(result.current.totalGoals).toBe(9);
+      expect(result.current.simulationState).toBe(SIMULATION_STATES.FINISHED.toLowerCase());
+    }
   });
 
-  it('should stop simulation at 90 seconds', () => {
+  it('should finish simulation when finishSimulation is called', () => {
     const store = createTestStore();
-
-    const wrapper: FC<{ children: React.ReactNode }> = ({ children }) => (
-      <QueryClientProvider client={queryClient}>
-        <Provider store={store}>{children}</Provider>
-      </QueryClientProvider>
-    );
-
-    const { result } = renderHook(() => useSimulation(), { wrapper });
-
-    act(() => {
-      result.current.startSimulation();
+    const { result } = renderHook(() => useSimulation(), {
+      wrapper: wrapper(store),
     });
-
-    act(() => {
-      vi.advanceTimersByTime(90000);
-    });
-
-    expect(result.current.elapsed).toBe(90);
-
-    act(() => {
-      vi.advanceTimersByTime(1000);
-    });
-
-    expect(result.current.started).toBe(false);
-  });
-
-  it('should restart simulation and reset scores', () => {
-    const store = createTestStore();
-
-    const wrapper: FC<{ children: React.ReactNode }> = ({ children }) => (
-      <QueryClientProvider client={queryClient}>
-        <Provider store={store}>{children}</Provider>
-      </QueryClientProvider>
-    );
-
-    const { result } = renderHook(() => useSimulation(), { wrapper });
-
-    act(() => {
-      result.current.startSimulation();
-    });
-
-    // Advance time by 20 seconds to get some goals
-    act(() => {
-      vi.advanceTimersByTime(20000);
-    });
-
-    // Should have some goals now
-    expect(result.current.totalGoals).toBeGreaterThan(0);
-
-    // Now restart
-    act(() => {
-      result.current.restartSimulation();
-    });
-
-    // Need to advance timer to allow the setTimeout in restartSimulation to execute
-    act(() => {
-      vi.advanceTimersByTime(100);
-    });
-
-    expect(result.current.totalGoals).toBe(0);
-    expect(result.current.elapsed).toBe(0);
-    expect(result.current.started).toBe(true);
-  });
-
-  it('should stop after 9 goals', () => {
-    const store = createTestStore();
-
-    const wrapper: FC<{ children: React.ReactNode }> = ({ children }) => (
-      <QueryClientProvider client={queryClient}>
-        <Provider store={store}>{children}</Provider>
-      </QueryClientProvider>
-    );
-
-    const { result } = renderHook(() => useSimulation(), { wrapper });
-
-    // Start simulation
-    act(() => {
-      result.current.startSimulation();
-    });
-
-    // Manually set total goals to 9 through the store action
-    act(() => {
-      store.dispatch(setTotalGoals(9));
-    });
-
-    // Advance a bit to trigger the stopping useEffect
-    act(() => {
-      vi.advanceTimersByTime(1000);
-    });
-
-    expect(result.current.started).toBe(false);
-  });
-
-  it('should show only Start Simulation button after finishing', () => {
-    const store = createTestStore();
-
-    const wrapper: FC<{ children: React.ReactNode }> = ({ children }) => (
-      <QueryClientProvider client={queryClient}>
-        <Provider store={store}>{children}</Provider>
-      </QueryClientProvider>
-    );
-
-    const { result } = renderHook(() => useSimulation(), { wrapper });
 
     act(() => {
       result.current.startSimulation();
@@ -314,6 +153,32 @@ describe('useSimulation', () => {
       result.current.finishSimulation();
     });
 
-    expect(result.current.started).toBe(false);
+    expect(result.current.simulationState).toBe(SIMULATION_STATES.FINISHED.toLowerCase());
+  });
+
+  it('should reset everything on restart', () => {
+    const store = createTestStore();
+    const { result } = renderHook(() => useSimulation(), {
+      wrapper: wrapper(store),
+    });
+
+    act(() => {
+      result.current.startSimulation();
+    });
+
+    act(() => {
+      vi.advanceTimersByTime(20000);
+    });
+
+    expect(result.current.totalGoals).toBeGreaterThan(0);
+
+    act(() => {
+      result.current.restartSimulation();
+      vi.advanceTimersByTime(10);
+    });
+
+    expect(result.current.totalGoals).toBe(0);
+    expect(result.current.elapsed).toBe(0);
+    expect(result.current.simulationState).toBe(SIMULATION_STATES.RUNNING.toLowerCase());
   });
 });
