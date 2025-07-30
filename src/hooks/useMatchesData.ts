@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
-import { updateSimulationState } from '../store';
+import { setMatches } from '../store';
 import { useTeamsQuery } from './useTeamsQuery';
 import { useResultsQuery } from './useResultsQuery';
 
@@ -28,7 +28,7 @@ export function useMatchesData() {
         lastScorer: null,
       };
     });
-    dispatch(updateSimulationState({ matches }));
+    dispatch(setMatches(matches));
   }, [teams, dispatch, results]);
 
   return {

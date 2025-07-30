@@ -35,12 +35,21 @@ const matchSlice = createSlice({
   name: 'match',
   initialState,
   reducers: {
-    updateSimulationState: (state, action: PayloadAction<UpdateSimulationStatePayload>) => {
-      Object.assign(state, action.payload);
+    setMatches: (state, action: PayloadAction<Match[]>) => {
+      state.matches = action.payload;
+    },
+    setTotalGoals: (state, action: PayloadAction<number>) => {
+      state.totalGoals = action.payload;
+    },
+    setElapsed: (state, action: PayloadAction<number>) => {
+      state.elapsed = action.payload;
+    },
+    setSimulationState: (state, action: PayloadAction<SimulationState>) => {
+      state.simulationState = action.payload;
     },
   },
 });
 
-export const { updateSimulationState } = matchSlice.actions;
+export const { setMatches, setTotalGoals, setElapsed, setSimulationState } = matchSlice.actions;
 
 export default matchSlice.reducer;

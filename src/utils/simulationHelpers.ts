@@ -1,6 +1,13 @@
-import { UnknownAction } from '@reduxjs/toolkit';
+import React from 'react';
 import { MAX_MINUTES } from '../constants';
-import { AppDispatch, Match, UpdateSimulationStatePayload } from '../store';
+import {
+  AppDispatch,
+  Match,
+  setElapsed,
+  setMatches,
+  setSimulationState,
+  setTotalGoals,
+} from '../store';
 import { clearLastScorer, updateMatchWithGoal } from './matchUtils';
 
 const GOAL_INTERVAL = 10;
@@ -12,7 +19,10 @@ type RunSimulationIntervalArguments = {
   matchesRef: React.RefObject<Match[]>;
   totalGoalsRef: React.RefObject<number>;
   dispatch: AppDispatch;
-  updateSimulationState: (state: UpdateSimulationStatePayload) => UnknownAction;
+  setMatches: typeof setMatches;
+  setTotalGoals: typeof setTotalGoals;
+  setElapsed: typeof setElapsed;
+  setSimulationState: typeof setSimulationState;
 };
 
 export function clearSimInterval(ref: React.RefObject<ReturnType<typeof setInterval> | null>) {
@@ -27,7 +37,10 @@ export function runSimulationInterval({
   matchesRef,
   totalGoalsRef,
   dispatch,
-  updateSimulationState,
+  setMatches,
+  setTotalGoals,
+  setElapsed,
+  setSimulationState,
 }: RunSimulationIntervalArguments) {
   let seconds = 0;
   intervalRef.current = setInterval(() => {
@@ -42,28 +55,20 @@ export function runSimulationInterval({
 
       const updatedMatches = updateMatchWithGoal(currentMatches, matchIndex, team);
 
-      dispatch(
-        updateSimulationState({
-          matches: updatedMatches,
-          totalGoals: currentTotalGoals + 1,
-        }),
-      );
+      dispatch(setMatches(updatedMatches));
+      dispatch(setTotalGoals(currentTotalGoals + 1));
 
       setTimeout(() => {
-        dispatch(updateSimulationState({ matches: clearLastScorer(updatedMatches) }));
+        dispatch(setMatches(clearLastScorer(updatedMatches)));
       }, GOAL_HIGHLIGHT_DURATION_MS);
     }
 
-    dispatch(updateSimulationState({ elapsed: seconds }));
+    dispatch(setElapsed(seconds));
 
     if (seconds >= MAX_MINUTES) {
       clearSimInterval(intervalRef);
-      dispatch(
-        updateSimulationState({
-          simulationState: 'finished',
-          elapsed: seconds,
-        }),
-      );
+      dispatch(setSimulationState('finished'));
+      dispatch(setElapsed(seconds));
       return;
     }
   }, TICK_INTERVAL_MS);

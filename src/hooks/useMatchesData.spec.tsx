@@ -1,6 +1,6 @@
 import * as reactRedux from 'react-redux';
 import { renderHook } from '@testing-library/react';
-import { updateSimulationState } from '../store';
+import { setMatches } from '../store';
 import { useMatchesData } from './useMatchesData';
 import { Mock } from 'vitest';
 import { useTeamsQuery } from './useTeamsQuery';
@@ -15,8 +15,8 @@ vi.mock('react-redux', async (importOriginal) => {
 });
 
 vi.mock('../store', () => ({
-  updateSimulationState: vi.fn((payload) => ({
-    type: 'updateSimulationState',
+  setMatches: vi.fn((payload) => ({
+    type: 'setMatches',
     payload,
   })),
 }));
@@ -56,7 +56,7 @@ describe('UseCombinedMatchesQuery', () => {
     expect(result.current.resultsError).toBe('Some error');
   });
 
-  it('should dispatch updateSimulationState with correct matches when teams and results are loaded', () => {
+  it('should dispatch setMatches with correct matches when teams and results are loaded', () => {
     const teams = [
       { name: 'A', flag: '🇦🇷' },
       { name: 'B', flag: '🇧🇷' },
@@ -79,20 +79,18 @@ describe('UseCombinedMatchesQuery', () => {
 
     renderHook(() => useMatchesData());
 
-    expect(updateSimulationState).toHaveBeenCalledWith({
-      matches: [
-        {
-          id: 1,
-          homeTeam: 'A',
-          awayTeam: 'B',
-          homeScore: 2,
-          awayScore: 1,
-          homeFlag: '🇦🇷',
-          awayFlag: '🇧🇷',
-          lastScorer: null,
-        },
-      ],
-    });
+    expect(setMatches).toHaveBeenCalledWith([
+      {
+        id: 1,
+        homeTeam: 'A',
+        awayTeam: 'B',
+        homeScore: 2,
+        awayScore: 1,
+        homeFlag: '🇦🇷',
+        awayFlag: '🇧🇷',
+        lastScorer: null,
+      },
+    ]);
     expect(dispatch).toHaveBeenCalled();
   });
 

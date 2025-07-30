@@ -1,7 +1,7 @@
 import { useEffect, useRef, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../store/store';
-import { updateSimulationState } from '../store';
+import { setMatches, setTotalGoals, setElapsed, setSimulationState } from '../store';
 import { SIMULATION_STATES } from '../constants';
 import { clearSimInterval, resetAllMatches, runSimulationInterval } from '../utils';
 
@@ -23,49 +23,41 @@ export function useSimulation() {
   const startSimulation = useCallback(() => {
     clearSimInterval(intervalRef);
 
-    dispatch(
-      updateSimulationState({
-        matches: resetAllMatches(matches),
-        totalGoals: 0,
-        elapsed: 0,
-        simulationState: SIMULATION_STATES.RUNNING,
-      }),
-    );
+    dispatch(setMatches(resetAllMatches(matches)));
+    dispatch(setTotalGoals(0));
+    dispatch(setElapsed(0));
+    dispatch(setSimulationState(SIMULATION_STATES.RUNNING));
 
     runSimulationInterval({
       intervalRef,
       matchesRef,
       totalGoalsRef,
       dispatch,
-      updateSimulationState,
+      setMatches,
+      setTotalGoals,
+      setElapsed,
+      setSimulationState,
     });
   }, [dispatch, matches]);
 
   const restartSimulation = useCallback(() => {
     clearSimInterval(intervalRef);
 
-    dispatch(
-      updateSimulationState({
-        matches: resetAllMatches(matches),
-        totalGoals: 0,
-        elapsed: 0,
-        simulationState: SIMULATION_STATES.IDLE,
-      }),
-    );
+    dispatch(setMatches(resetAllMatches(matches)));
+    dispatch(setTotalGoals(0));
+    dispatch(setElapsed(0));
+    dispatch(setSimulationState(SIMULATION_STATES.IDLE));
 
     setTimeout(startSimulation, 0);
   }, [dispatch, startSimulation, matches]);
 
   const finishSimulation = useCallback(() => {
     clearSimInterval(intervalRef);
-    dispatch(
-      updateSimulationState({
-        matches: resetAllMatches(matches),
-        simulationState: SIMULATION_STATES.FINISHED,
-      }),
-    );
+    dispatch(setMatches(resetAllMatches(matches)));
+    dispatch(setSimulationState(SIMULATION_STATES.FINISHED));
+
     if (matches) {
-      dispatch(updateSimulationState({ matches }));
+      dispatch(setMatches(matches));
     }
   }, [dispatch, matches]);
 
