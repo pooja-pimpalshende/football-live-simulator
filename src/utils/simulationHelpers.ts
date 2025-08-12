@@ -2,13 +2,13 @@ import React from 'react';
 import { MAX_MINUTES } from '../constants';
 import {
   AppDispatch,
-  Match,
   setElapsed,
   setMatches,
   setSimulationState,
   setTotalGoals,
+  store,
 } from '../store';
-import { clearLastScorer, updateMatchWithGoal } from './matchUtils';
+import { clearLastScorer, updateMatchWithGoal } from '../store';
 
 const GOAL_INTERVAL = 10;
 const TICK_INTERVAL_MS = 1000;
@@ -16,8 +16,6 @@ const GOAL_HIGHLIGHT_DURATION_MS = 1500;
 
 type RunSimulationIntervalArguments = {
   intervalRef: React.RefObject<ReturnType<typeof setInterval> | null>;
-  matchesRef: React.RefObject<Match[]>;
-  totalGoalsRef: React.RefObject<number>;
   dispatch: AppDispatch;
   setMatches: typeof setMatches;
   setTotalGoals: typeof setTotalGoals;
@@ -34,10 +32,7 @@ export function clearSimInterval(ref: React.RefObject<ReturnType<typeof setInter
 
 export function runSimulationInterval({
   intervalRef,
-  matchesRef,
-  totalGoalsRef,
   dispatch,
-  setMatches,
   setTotalGoals,
   setElapsed,
   setSimulationState,
@@ -46,20 +41,19 @@ export function runSimulationInterval({
   intervalRef.current = setInterval(() => {
     seconds += 1;
 
-    const currentMatches = matchesRef.current;
-    const currentTotalGoals = totalGoalsRef.current;
+    const state = store.getState();
+    const currentMatches = state.match.matches;
+    const currentTotalGoals = state.match.totalGoals;
 
     if (seconds % GOAL_INTERVAL === 0) {
       const matchIndex = Math.floor(Math.random() * currentMatches.length);
       const team = Math.random() < 0.5 ? 'homeScore' : 'awayScore';
 
-      const updatedMatches = updateMatchWithGoal(currentMatches, matchIndex, team);
-
-      dispatch(setMatches(updatedMatches));
+      dispatch(updateMatchWithGoal({ matchIndex, team }));
       dispatch(setTotalGoals(currentTotalGoals + 1));
 
       setTimeout(() => {
-        dispatch(setMatches(clearLastScorer(updatedMatches)));
+        dispatch(clearLastScorer());
       }, GOAL_HIGHLIGHT_DURATION_MS);
     }
 

@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { FC, memo } from 'react';
 import { Card, CardContent, Badge } from '@shadcn-ui';
 import { Match } from '../../store';
 import { AWAY, HOME } from '../../constants';
@@ -7,7 +7,7 @@ interface MatchCardProps {
   match: Match;
 }
 
-export const MatchCard: FC<MatchCardProps> = ({ match }) => {
+export const MatchCard: FC<MatchCardProps> = memo(({ match }) => {
   return (
     <Card
       data-testid="match-score"
@@ -63,4 +63,4 @@ export const MatchCard: FC<MatchCardProps> = ({ match }) => {
       </CardContent>
     </Card>
   );
-};
+});

@@ -1,8 +1,9 @@
-import { FC } from 'react';
-import { useSimulation } from '../../hooks';
+import { FC, memo } from 'react';
+import { useSelector } from 'react-redux';
+import { RootState } from 'src/store';
 
-export const Header: FC = () => {
-  const { totalGoals } = useSimulation();
+export const Header: FC = memo(() => {
+  const totalGoals = useSelector((state: RootState) => state.match.totalGoals);
   return (
     <header className={`${'bg-white border-gray-200'} border-b shadow-sm`}>
       <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
@@ -29,4 +30,4 @@ export const Header: FC = () => {
       </div>
     </header>
   );
-};
+});
