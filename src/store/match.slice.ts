@@ -47,9 +47,57 @@ const matchSlice = createSlice({
     setSimulationState: (state, action: PayloadAction<SimulationState>) => {
       state.simulationState = action.payload;
     },
+    updateMatchWithGoal: (
+      state,
+      action: PayloadAction<{
+        matchIndex: number;
+        team: 'homeScore' | 'awayScore';
+      }>,
+    ) => {
+      const { matchIndex, team } = action.payload;
+      state.matches = state.matches.map((match, index) =>
+        index === matchIndex
+          ? { ...match, [team]: match[team] + 1, lastScorer: team === 'homeScore' ? HOME : AWAY }
+          : { ...match, lastScorer: null },
+      );
+    },
+    clearLastScorer: (state) => {
+      state.matches = state.matches.map((match) => ({
+        ...match,
+        lastScorer: null,
+      }));
+    },
+    resetAllMatches: (state) => {
+      state.matches = state.matches.map((match) => ({
+        ...match,
+        homeScore: 0,
+        awayScore: 0,
+        lastScorer: null,
+      }));
+    },
+    resetSimulation: (state) => {
+      state.totalGoals = 0;
+      state.elapsed = 0;
+      state.simulationState = SIMULATION_STATES.IDLE;
+      state.matches = state.matches.map((match) => ({
+        ...match,
+        homeScore: 0,
+        awayScore: 0,
+        lastScorer: null,
+      }));
+    },
   },
 });
 
-export const { setMatches, setTotalGoals, setElapsed, setSimulationState } = matchSlice.actions;
+export const {
+  setMatches,
+  setTotalGoals,
+  setElapsed,
+  setSimulationState,
+  updateMatchWithGoal,
+  clearLastScorer,
+  resetAllMatches,
+  resetSimulation,
+} = matchSlice.actions;
 
 export default matchSlice.reducer;
